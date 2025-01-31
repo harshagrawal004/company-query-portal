@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export function Navbar() {
           >
             Upgrade
           </Button>
+          <ThemeToggle />
         </div>
       </div>
     </nav>
