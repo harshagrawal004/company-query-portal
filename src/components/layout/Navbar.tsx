@@ -24,12 +24,6 @@ export function Navbar() {
           >
             History
           </Button>
-          <Button
-            variant="default"
-            onClick={() => navigate("/pricing")}
-          >
-            Upgrade
-          </Button>
           <ThemeToggle />
         </div>
       </div>

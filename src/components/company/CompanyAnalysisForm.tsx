@@ -8,13 +8,21 @@ import { Loader2 } from "lucide-react";
 interface CompanyData {
   companyName: string;
   companyWebsite: string;
+  timestamp?: string;
 }
 
 interface AnalysisResponse {
-  data: any; // Type this based on your n8n webhook response
+  data: any;
   status: 'success' | 'error';
   message?: string;
 }
+
+// Store in localStorage for history
+const saveToHistory = (data: CompanyData & { result: any }) => {
+  const history = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+  const newHistory = [{ ...data, timestamp: new Date().toISOString() }, ...history];
+  localStorage.setItem('analysisHistory', JSON.stringify(newHistory));
+};
 
 export function CompanyAnalysisForm() {
   const [companyData, setCompanyData] = useState<CompanyData>({
@@ -30,7 +38,8 @@ export function CompanyAnalysisForm() {
     setLoading(true);
 
     try {
-      const response = await fetch('YOUR_N8N_WEBHOOK_URL', {
+      // Replace this URL with your actual n8n webhook URL
+      const response = await fetch('https://your-n8n-webhook-url/webhook', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,11 +47,18 @@ export function CompanyAnalysisForm() {
         body: JSON.stringify(companyData),
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to analyze company');
+      }
+
       const data = await response.json();
       setResult({
         data,
         status: 'success',
       });
+
+      // Save to history
+      saveToHistory({ ...companyData, result: data });
 
       toast({
         title: "Analysis Complete",
@@ -115,7 +131,7 @@ export function CompanyAnalysisForm() {
 
       {result && (
         <Card className="p-6 glass-card animate-in">
-          <h3 className="text-xl font-semibold mb-4">Analysis Results</h3>
+          <h3 className="text-xl font-bold mb-4">Analysis Results</h3>
           <div className="space-y-4">
             {result.status === 'success' ? (
               <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-96">
