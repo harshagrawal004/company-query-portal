@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 interface CompanyData {
@@ -36,15 +36,18 @@ export function CompanyAnalysisForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setResult(null);
 
     try {
-      // Replace this URL with your actual n8n webhook URL
-      const response = await fetch('https://your-n8n-webhook-url/webhook', {
+      const response = await fetch('https://n8n-self-bowt.onrender.com/webhook-test/43999c32-ff3f-4c32-838a-88e5c104d4b0', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(companyData),
+        body: JSON.stringify({
+          companyName: companyData.companyName,
+          companyWebsite: companyData.companyWebsite
+        }),
       });
 
       if (!response.ok) {
@@ -65,10 +68,11 @@ export function CompanyAnalysisForm() {
         description: "Company data has been successfully analyzed.",
       });
     } catch (error) {
+      console.error('Analysis error:', error);
       setResult({
         data: null,
         status: 'error',
-        message: 'Failed to analyze company data',
+        message: 'Failed to analyze company data. Please try again.',
       });
 
       toast({
